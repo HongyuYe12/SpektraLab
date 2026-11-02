@@ -81,6 +81,15 @@ def main():
     env=dict(os.environ)
     if a.cc:env['CC']=a.cc
     if a.cxx:env['CXX']=a.cxx
+    # Meson discovers Ninja from PATH even when the caller supplies --make.
+    # Keep the pinned executable authoritative and expose only its directory,
+    # along with CMake, to Meson's child-process lookup.
+    tool_dirs=[]
+    for tool in (a.make,a.cmake):
+        if tool:
+            directory=str(Path(tool).resolve().parent)
+            if directory not in tool_dirs:tool_dirs.append(directory)
+    if tool_dirs:env['PATH']=os.pathsep.join(tool_dirs+[env.get('PATH','')])
     meson=[sys.executable,'-m','mesonbuild.mesonmain']
     gb=build/'glib'
     configure=meson+['setup',str(gb),str(glib),'--prefix='+str(prefix),'--libdir=lib',
