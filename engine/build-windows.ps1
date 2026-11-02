@@ -12,6 +12,7 @@ param(
     [string]$LibRawSourceDirectory,
     [string]$InputCodecPrefix,
     [string]$LensPrefix,
+    [string]$DependencyDirectory,
     [switch]$HostBuild,
     [switch]$NativeRaw = $true,
     [switch]$Desktop = $true,
@@ -64,10 +65,17 @@ if (Test-Path -LiteralPath $matlabDirectory -PathType Container) {
 $CMakeExecutable = Resolve-Tool $CMakeExecutable 'cmake.exe' $cmakeCandidates
 $Compiler = Resolve-Tool $Compiler 'g++.exe' @()
 $compilerDirectory = Split-Path $Compiler -Parent
-$MakeExecutable = Resolve-Tool $MakeExecutable 'mingw32-make.exe' @((Join-Path $compilerDirectory 'mingw32-make.exe'))
+$makeCandidates = @((Join-Path $compilerDirectory 'mingw32-make.exe'), (Join-Path $compilerDirectory 'ninja.exe'))
+$vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+if (Test-Path -LiteralPath $vswhere) {
+    $vsRoot = & $vswhere -latest -products * -property installationPath
+    if ($vsRoot) { $makeCandidates += Join-Path $vsRoot 'Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja\ninja.exe' }
+}
+$MakeExecutable = Resolve-Tool $MakeExecutable 'ninja.exe or mingw32-make.exe' $makeCandidates
 $CTestExecutable = Resolve-Tool $CTestExecutable 'ctest.exe' @((Join-Path (Split-Path $CMakeExecutable -Parent) 'ctest.exe'))
 
-$dependencyDirectory = Join-Path $workspaceDirectory 'deps'
+if (-not $DependencyDirectory) { $DependencyDirectory = Join-Path $sourceDirectory 'build\deps' }
+$dependencyDirectory = [IO.Path]::GetFullPath($DependencyDirectory)
 if (-not $VulkanIncludeDirectory) {
     $includeCandidates = @((Join-Path $dependencyDirectory 'Vulkan-Headers\include'))
     if ($env:VULKAN_SDK) { $includeCandidates = @((Join-Path $env:VULKAN_SDK 'Include')) + $includeCandidates }
@@ -89,10 +97,14 @@ $previousPath = $env:PATH
 try {
     $env:PATH = $compilerDirectory + [IO.Path]::PathSeparator + $previousPath
     New-Item -ItemType Directory -Path $BuildDirectory -Force | Out-Null
+    $generator = if ([IO.Path]::GetFileName($MakeExecutable) -like 'ninja*') { 'Ninja' } else { 'MinGW Makefiles' }
+    $cCompiler = Join-Path $compilerDirectory 'gcc.exe'
     $configureArguments = @('-S', $sourceDirectory, '-B', $BuildDirectory,
-        '-G', 'MinGW Makefiles', '-DCMAKE_BUILD_TYPE=Release',
+        '-G', $generator, '-DCMAKE_BUILD_TYPE=Release',
+        "-DCMAKE_C_COMPILER=$($cCompiler.Replace('\', '/'))",
         "-DCMAKE_CXX_COMPILER=$($Compiler.Replace('\', '/'))", "-DCMAKE_MAKE_PROGRAM=$($MakeExecutable.Replace('\', '/'))",
         '-DBUILD_TESTING=ON', '-DSPEKTRALAB_REQUIRE_VULKAN=ON', '-DSPEKTRALAB_BUILD_TEST_DLL=ON',
+        '-DSPEKTRALAB_STATIC_RUNTIME=ON',
         "-DSPEKTRALAB_VULKAN_INCLUDE_DIR=$($VulkanIncludeDirectory.Replace('\', '/'))",
         "-DSPEKTRALAB_VULKAN_LIBRARY=$($VulkanLibrary.Replace('\', '/'))", "-DSPEKTRALAB_GLSLANG=$($GlslangExecutable.Replace('\', '/'))")
     if ($Fresh) { $configureArguments = @('--fresh') + $configureArguments }
