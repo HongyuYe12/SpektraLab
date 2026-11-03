@@ -1,5 +1,31 @@
 ![spektrafilm banner](img/readme/banner.jpg)
 
+## SpektraStudio desktop application
+
+This branch packages the desktop product as **SpektraStudio** and adds an
+English / Simplified Chinese interface. The physical simulation engine, Python
+package names, profile and LUT formats, attribution, and licensing remain those
+of the upstream **spektrafilm** project by Andrea Volpato.
+
+Launch the application with `spektrastudio`. The original `spektrafilm` command
+is retained as a compatibility alias. Choose **CONFIG > Language** to switch
+between English and 简体中文, then restart SpektraStudio to apply the change.
+
+### Windows executable and installer
+
+The reproducible Windows packaging configuration is under `packaging/`. With
+Python 3.13, PyInstaller, and Inno Setup 6 installed, build the application and
+installer with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_windows_installer.ps1
+```
+
+The installer is written to
+`dist/installer/SpektraStudio-0.3.4-Windows-x64-Setup.exe`. The packaged app
+includes the GPLv3 license, the spektrafilm profile license, and the upstream
+citation metadata.
+
 > [!WARNING]
 >
 > **I love building spektrafilm**, and I invested already hundreds of hours in it. Right now it’s a nights-and-weekends project. If it will help pay some bills, I can keep improving it for everyone. 🙂 Any **support** is really appreciated: [Buy me a coffee](https://buymeacoffee.com/andreavolpato)
