@@ -28,6 +28,7 @@ from spektrafilm_gui.napari_layout import dialog_parent, reset_viewer_camera, se
 from spektrafilm_gui.params_mapper import build_params_from_state
 from spektrafilm_gui.state_bridge import apply_gui_state, collect_gui_state
 from spektrafilm_gui.widgets import WidgetBundle
+from spektrafilm_gui.i18n import tr, TranslatedMessageBox
 
 OUTPUT_FLOAT_DATA_KEY = 'pipeline_float_output'
 OUTPUT_COLOR_SPACE_KEY = 'pipeline_output_color_space'
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
 QThreadPool = getattr(QtCore, 'QThreadPool')
 QTimer = getattr(QtCore, 'QTimer')
 QFileDialog = QtWidgets.QFileDialog
-QMessageBox = QtWidgets.QMessageBox
+QMessageBox = TranslatedMessageBox
 SimulationRequest = runtime.SimulationRequest
 SimulationResult = runtime.SimulationResult
 STARTUP_PREVIEW_ASPECT_RATIO = (3, 2)
@@ -57,14 +58,14 @@ class _DirMemoryDialog:
     def get_save_file_name(self, parent, title, filename, file_filter):
         last_dir = load_dialog_dir(self._key)
         initial = str(Path(last_dir) / Path(filename).name) if last_dir else filename
-        path, fmt = QFileDialog.getSaveFileName(parent, title, initial, file_filter)
+        path, fmt = QFileDialog.getSaveFileName(parent, tr(title), initial, file_filter)
         if path:
             save_dialog_dir(self._key, str(Path(path).parent))
         return path, fmt
 
     def get_open_file_name(self, parent, title, _initial, file_filter):
         path, fmt = QFileDialog.getOpenFileName(
-            parent, title, load_dialog_dir(self._key), file_filter
+            parent, tr(title), load_dialog_dir(self._key), file_filter
         )
         if path:
             save_dialog_dir(self._key, str(Path(path).parent))

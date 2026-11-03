@@ -28,11 +28,13 @@ _LUT_LICENSE_URL = "https://github.com/andreavolpato/spektrafilm/blob/main/SPEKT
 
 
 def _spektrafilm_version() -> str:
-    """The installed spektrafilm distribution version, or ``0+unknown``."""
-    try:
-        return distribution_version("spektrafilm")
-    except PackageNotFoundError:
-        return "0+unknown"
+    """The installed SpektraStudio/spektrafilm distribution version."""
+    for distribution_name in ("spektrastudio", "spektrafilm"):
+        try:
+            return distribution_version(distribution_name)
+        except PackageNotFoundError:
+            continue
+    return "0+unknown"
 
 
 def _created_iso8601() -> str:

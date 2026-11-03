@@ -70,7 +70,7 @@ def test_write_metadata_carries_source_tags_and_sets_overrides(tmp_path, monkeyp
 
     # Overridden tags
     assert exif["Exif.Image.Orientation"] == "1"
-    assert exif["Exif.Image.Software"] == "spektrafilm"
+    assert exif["Exif.Image.Software"] == "SpektraStudio (powered by spektrafilm)"
     assert exif["Exif.Image.DateTime"] == "2025:06:15 12:30:45"
     assert exif["Exif.Photo.PixelXDimension"] == "16"
     assert exif["Exif.Photo.PixelYDimension"] == "12"
@@ -217,5 +217,5 @@ def test_write_metadata_without_source_still_writes_overrides(tmp_path):
     result = read_image_metadata(str(destination_path))
     exif = _read_tags(result.exif)
 
-    assert exif["Exif.Image.Software"] == "spektrafilm"
+    assert exif["Exif.Image.Software"] == "SpektraStudio (powered by spektrafilm)"
     assert exif["Exif.Photo.ColorSpace"] == "1"

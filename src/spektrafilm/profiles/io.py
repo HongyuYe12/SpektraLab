@@ -26,10 +26,12 @@ LEGACY_PROFILE_INFO_KEYS = frozenset({
 
 
 def _package_version() -> str:
-    try:
-        return distribution_version('spektrafilm')
-    except PackageNotFoundError:
-        return '0+unknown'
+    for distribution_name in ('spektrastudio', 'spektrafilm'):
+        try:
+            return distribution_version(distribution_name)
+        except PackageNotFoundError:
+            continue
+    return '0+unknown'
 
 def _created_date() -> str:
     return date.today().isoformat()

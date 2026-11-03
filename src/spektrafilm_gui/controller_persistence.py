@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from typing import Any, Callable
 
+from spektrafilm_gui.i18n import tr
+
 
 def save_current_as_default(
     *,
@@ -37,7 +39,7 @@ def save_current_state_to_file(
 ) -> None:
     filepath, _ = file_dialog.get_save_file_name(
         dialog_parent_fn(viewer),
-        'Save GUI state',
+        tr('Save GUI state'),
         'gui_state.json',
         'JSON (*.json)',
     )
@@ -68,7 +70,7 @@ def load_state_from_file(
 ) -> None:
     filepath, _ = file_dialog.get_open_file_name(
         dialog_parent_fn(viewer),
-        'Load GUI state',
+        tr('Load GUI state'),
         '',
         'JSON (*.json)',
     )

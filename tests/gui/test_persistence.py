@@ -50,11 +50,32 @@ def test_load_default_gui_state_uses_factory_when_missing(monkeypatch, tmp_path:
         'spektrafilm_gui.persistence.default_gui_state_path',
         lambda: tmp_path / 'missing.json',
     )
+    monkeypatch.setattr(
+        'spektrafilm_gui.persistence.legacy_default_gui_state_path',
+        lambda: tmp_path / 'legacy-missing.json',
+    )
 
     restored = load_default_gui_state()
 
     assert restored == PROJECT_DEFAULT_GUI_STATE
     assert restored is not PROJECT_DEFAULT_GUI_STATE
+
+
+def test_load_default_gui_state_reads_legacy_location(monkeypatch, tmp_path: Path) -> None:
+    legacy_path = tmp_path / 'legacy' / 'gui_default_state.json'
+    state = make_test_gui_state()
+    state.simulation.enlarger.print_exposure = 1.7
+    save_gui_state_to_path(state, legacy_path)
+    monkeypatch.setattr(
+        'spektrafilm_gui.persistence.default_gui_state_path',
+        lambda: tmp_path / 'new-missing.json',
+    )
+    monkeypatch.setattr(
+        'spektrafilm_gui.persistence.legacy_default_gui_state_path',
+        lambda: legacy_path,
+    )
+
+    assert load_default_gui_state() == state
 
 
 def test_save_default_and_clear_saved_default(monkeypatch, tmp_path: Path) -> None:

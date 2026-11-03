@@ -20,9 +20,11 @@ from spektrafilm_gui.state import (
     simulation_to_dict,
     special_to_dict,
 )
+from spektrafilm_gui.i18n import APP_NAME
 
 
 DEFAULT_GUI_STATE_FILENAME = "gui_default_state.json"
+LEGACY_APPLICATION_NAME = 'spektrafilm'
 QSettings = cast(Any, getattr(QtCore, 'QSettings'))
 QStandardPaths = cast(Any, getattr(QtCore, 'QStandardPaths'))
 
@@ -74,9 +76,12 @@ def gui_state_from_dict(data: dict[str, Any]) -> GuiState:
 
 def load_default_gui_state() -> GuiState:
     default_path = default_gui_state_path()
-    if not default_path.exists():
-        return clone_gui_state(PROJECT_DEFAULT_GUI_STATE)
-    return load_gui_state_from_path(default_path)
+    if default_path.exists():
+        return load_gui_state_from_path(default_path)
+    legacy_path = legacy_default_gui_state_path()
+    if legacy_path.exists():
+        return load_gui_state_from_path(legacy_path)
+    return clone_gui_state(PROJECT_DEFAULT_GUI_STATE)
 
 
 def save_default_gui_state(state: GuiState) -> Path:
@@ -108,6 +113,10 @@ def default_gui_state_path() -> Path:
     app_config_location = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
     if app_config_location:
         return Path(app_config_location) / DEFAULT_GUI_STATE_FILENAME
+    return Path.home() / ".spektrastudio" / DEFAULT_GUI_STATE_FILENAME
+
+
+def legacy_default_gui_state_path() -> Path:
     return Path.home() / ".spektrafilm" / DEFAULT_GUI_STATE_FILENAME
 
 
@@ -145,8 +154,12 @@ def _merge_into_dataclass(target: Any, data: Any) -> Any:
 
 
 def load_dialog_dir(key: str) -> str:
-    return QSettings('spektrafilm', 'spektrafilm').value(f'dialog_dirs/{key}', '')
+    setting_key = f'dialog_dirs/{key}'
+    current = QSettings(APP_NAME, APP_NAME).value(setting_key, '')
+    if current:
+        return current
+    return QSettings(LEGACY_APPLICATION_NAME, LEGACY_APPLICATION_NAME).value(setting_key, '')
 
 
 def save_dialog_dir(key: str, directory: str) -> None:
-    QSettings('spektrafilm', 'spektrafilm').setValue(f'dialog_dirs/{key}', directory)
+    QSettings(APP_NAME, APP_NAME).setValue(f'dialog_dirs/{key}', directory)

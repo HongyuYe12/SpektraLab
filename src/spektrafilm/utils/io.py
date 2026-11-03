@@ -105,7 +105,7 @@ def write_image_metadata(
 
     destination_exif["Exif.Image.Orientation"] = 1
     destination_exif["Exif.Image.DateTime"] = datetime.datetime.now().strftime("%Y:%m:%d %H:%M:%S")
-    destination_exif["Exif.Image.Software"] = "spektrafilm"
+    destination_exif["Exif.Image.Software"] = "SpektraStudio (powered by spektrafilm)"
     destination_exif["Exif.Photo.PixelXDimension"] = spec.width
     destination_exif["Exif.Photo.PixelYDimension"] = spec.height
 

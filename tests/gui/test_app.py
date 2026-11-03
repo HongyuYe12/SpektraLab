@@ -551,3 +551,23 @@ def test_build_main_window_for_app_uses_gray_18_canvas_state() -> None:
     assert captured['panel_args'] == (viewer, widgets)
     assert captured['window_args'][0] is viewer
     assert main_window is fake_main_window
+
+
+def test_configure_application_identity_sets_spektrastudio_brand(monkeypatch) -> None:
+    calls: dict[str, str] = {}
+    fake_app = SimpleNamespace(
+        setApplicationDisplayName=lambda value: calls.setdefault('display_name', value),
+    )
+    monkeypatch.setattr(app_module.QtWidgets.QApplication, 'instance', staticmethod(lambda: fake_app))
+    monkeypatch.setattr(app_module.QtCore.QCoreApplication, 'setApplicationName', staticmethod(lambda value: calls.setdefault('name', value)))
+    monkeypatch.setattr(app_module.QtCore.QCoreApplication, 'setApplicationVersion', staticmethod(lambda value: calls.setdefault('version', value)))
+    monkeypatch.setattr(app_module.QtCore.QCoreApplication, 'setOrganizationName', staticmethod(lambda value: calls.setdefault('organization', value)))
+
+    app_module.configure_application_identity()
+
+    assert calls == {
+        'name': 'SpektraStudio',
+        'version': '0.3.4',
+        'organization': 'SpektraStudio',
+        'display_name': 'SpektraStudio',
+    }

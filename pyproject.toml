@@ -3,11 +3,11 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spektrafilm"
+name = "spektrastudio"
 version = "0.3.4"
-description = "Spectral simulation of analog film photography"
+description = "SpektraStudio bilingual desktop application powered by spektrafilm"
 readme = "README.md"
-requires-python = "~=3.13"
+requires-python = "~=3.13.0"
 license = { text = "GPLv3" }
 authors = [
     { name = "Andrea Volpato", email = "volpedellenevi@gmail.com" },
@@ -30,7 +30,7 @@ dependencies = [
     "exiv2~=0.18.1",
     "lensfunpy~=1.18.0",
     # GUI app dependencies — installed by default because the package
-    # ships the `spektrafilm` entry point, but not imported by the core
+    # ships the `spektrastudio` entry point, but not imported by the core
     # physical runtime under `spektrafilm/`.
     "qtpy~=2.4",
     "pyside6~=6.9",
@@ -38,7 +38,7 @@ dependencies = [
     "Pillow~=12.1",
     "pyconify~=0.2.1",
     # LUT creator dependencies — also installed by default because the
-    # package ships the `spektrafilm-lut` entry point, but they are not
+    # package ships the `spektrastudio-lut` entry point, but they are not
     # required by the core runtime.
     "markdown~=3.7",
 ]
@@ -51,6 +51,8 @@ dev = [
 ]
 
 [project.scripts]
+spektrastudio = "spektrafilm_gui.app:main"
+spektrastudio-lut = "spektrafilm_lut_creator.cli:main"
 spektrafilm = "spektrafilm_gui.app:main"
 spektrafilm-lut = "spektrafilm_lut_creator.cli:main"
 

@@ -174,6 +174,7 @@ def _make_gui_config_section(monkeypatch):
         save_current_to_file_requested=FakeNoArgSignal(),
         load_from_file_requested=FakeNoArgSignal(),
         restore_factory_default_requested=FakeNoArgSignal(),
+        _language_changed=lambda: None,
     )
     build_ui(section)
     return section, created_buttons

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from importlib import import_module
+import multiprocessing
 from typing import Any, Callable, cast
 
 import numpy as np
@@ -16,9 +17,19 @@ from spektrafilm_gui.persistence import load_default_gui_state
 from spektrafilm_gui.state_bridge import GUI_STATE_SECTION_NAMES, apply_gui_state
 from spektrafilm_gui.theme_palette import GRAY_0, GRAY_1, GRAY_2, GRAY_3, TEXT_DIM, TEXT_MAIN, TEXT_SELECTION_BG
 from spektrafilm_gui.widgets import WidgetBundle, create_widget_bundle
+from spektrafilm_gui.i18n import APP_NAME, saved_language, set_language
 from spektrafilm.utils.numba_warmup import warmup
 
 QThreadPool = getattr(QtCore, 'QThreadPool')
+
+
+def configure_application_identity() -> None:
+    QtCore.QCoreApplication.setApplicationName(APP_NAME)
+    QtCore.QCoreApplication.setApplicationVersion('0.3.4')
+    QtCore.QCoreApplication.setOrganizationName(APP_NAME)
+    qt_app = QtWidgets.QApplication.instance()
+    if qt_app is not None:
+        qt_app.setApplicationDisplayName(APP_NAME)
 QRunnable = getattr(QtCore, 'QRunnable')
 QTimer = getattr(QtCore, 'QTimer')
 
@@ -286,6 +297,7 @@ def build_main_window_for_app(
 
 
 def create_app() -> GuiApp:
+    set_language(saved_language(), persist=False)
     viewer = _create_viewer()
     _apply_app_palette()
     widgets = _create_widgets()
@@ -303,8 +315,11 @@ def create_app() -> GuiApp:
     )
 
 def main():
+    multiprocessing.freeze_support()
+    configure_application_identity()
     napari = import_module('napari')
     app = create_app()
+    configure_application_identity()
     show_viewer_window(app.viewer)
     napari.run()
 
