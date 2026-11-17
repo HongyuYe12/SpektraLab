@@ -4,7 +4,7 @@
 Vulkan 引擎和 Tauri 界面，已包含片边、日期后背和场景置位。旧
 `windows_UI/` Qt/QML 工程不参与本构建。
 
-本版还移植了 SpektraStudio 的整套设置持久化能力，但复用 SpektraLab
+本版还移植了 Windows 版的整套设置持久化能力，但复用 SpektraLab
 现有 sidecar 数据模型，不引入 Python/Pillow，也不改变编辑器布局。文件
 菜单可将当前设置保存为启动默认、导出或导入 JSON，以及恢复出厂默认。
 

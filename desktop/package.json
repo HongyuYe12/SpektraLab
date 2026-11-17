@@ -7,7 +7,7 @@
   "author": {
     "name": "SpektraLab contributors"
   },
-  "homepage": "https://github.com/HongyuYe12/SpektraStudio",
+  "homepage": "https://github.com/HongyuYe12/SpektraLab",
   "private": true,
   "scripts": {
     "dev:web": "vite",

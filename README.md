@@ -3,7 +3,7 @@
 **English** · [简体中文](README.zh-CN.md) · [Windows build notes](WINDOWS-README.md)
 
 > This repository's `main` branch is the native Windows edition maintained at
-> [HongyuYe12/SpektraStudio](https://github.com/HongyuYe12/SpektraStudio). It uses
+> [HongyuYe12/SpektraLab](https://github.com/HongyuYe12/SpektraLab). It uses
 > the C++/Vulkan engine and the Tauri interface; the legacy Qt frontend is not
 > part of the Windows build. The application remains **SpektraLab** and GPLv3.
 

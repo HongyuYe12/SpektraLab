@@ -3,7 +3,7 @@
 [English](README.md) · **简体中文** · [Windows 构建说明](WINDOWS-README.md)
 
 > 本仓库 `main` 分支是维护在
-> [HongyuYe12/SpektraStudio](https://github.com/HongyuYe12/SpektraStudio) 的原生 Windows 版。
+> [HongyuYe12/SpektraLab](https://github.com/HongyuYe12/SpektraLab) 的原生 Windows 版。
 > 它使用 C++/Vulkan 引擎与 Tauri 界面，不使用旧 Qt 前端；应用名称仍为 **SpektraLab**，
 > 并继续遵守 GPLv3。
 
