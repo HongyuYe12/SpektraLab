@@ -7,7 +7,7 @@
 import { webviewOwnsMenuKeys } from './keys';
 import { Menu, MenuItem, PredefinedMenuItem, Submenu } from '@tauri-apps/api/menu';
 import { t, tz } from '../i18n';
-import { openDialog, openExport, openFilesDialog, restartHost, revealSettings } from './actions';
+import { exportCurrentSettings, importSettings, openDialog, openExport, openFilesDialog, restartHost, restoreFactoryDefault, revealSettings, saveCurrentAsDefault } from './actions';
 import {
   setAdjustments,
   makePair,
@@ -77,6 +77,11 @@ export async function installMenu(): Promise<void> {
       await item(tz('Open Folder…', '打开文件夹…'), () => void openDialog(), 'CmdOrCtrl+O'),
       await item(tz('Open Photographs…', '打开照片…'), () => void openFilesDialog(), 'CmdOrCtrl+Shift+O'),
       await item(tz('Export…', '导出…'), openExport, 'CmdOrCtrl+E'),
+      await sep(),
+      await item(tz('Save Current Settings as Default', '将当前设置保存为默认值'), () => void saveCurrentAsDefault()),
+      await item(tz('Export Settings…', '导出设置…'), () => void exportCurrentSettings()),
+      await item(tz('Import Settings…', '导入设置…'), () => void importSettings()),
+      await item(tz('Restore Factory Default…', '恢复出厂默认值…'), () => void restoreFactoryDefault()),
       await sep(),
       await item(tz('Settings…', '设置…'), () => setPages({ settingsOpen: true }), 'CmdOrCtrl+,'),
       await sep(),

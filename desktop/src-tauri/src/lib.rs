@@ -223,6 +223,39 @@ fn store_write(app: AppHandle, state: State<'_, AppState>, area: String, name: S
 }
 
 #[tauri::command]
+fn store_remove(app: AppHandle, state: State<'_, AppState>, area: String, name: String) -> Result<(), String> {
+    let _lease=state.workspace.enter()?;
+    let p = store_path(&app, &area, &name)?;
+    match std::fs::remove_file(&p) {
+        Ok(()) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(format!("{}: {e}", p.display())),
+    }
+}
+
+fn json_path(path: String) -> Result<PathBuf, String> {
+    let p = PathBuf::from(path);
+    if !p.is_absolute() || p.extension().and_then(|s| s.to_str()).map(|s| !s.eq_ignore_ascii_case("json")).unwrap_or(true) {
+        return Err("Settings files must be absolute .json paths".into());
+    }
+    Ok(p)
+}
+
+#[tauri::command]
+fn read_json(path: String) -> Result<Value, String> {
+    let p = json_path(path)?;
+    let bytes = std::fs::read(&p).map_err(|e| format!("{}: {e}", p.display()))?;
+    if bytes.len() > 4 * 1024 * 1024 { return Err("Settings file is larger than 4 MB".into()); }
+    serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", p.display()))
+}
+
+#[tauri::command]
+fn write_json(path: String, value: Value) -> Result<(), String> {
+    let p = json_path(path)?;
+    files::write_atomic(&p, &serde_json::to_vec_pretty(&value).map_err(|e| e.to_string())?)
+}
+
+#[tauri::command]
 fn workspace_begin(state: State<'_,AppState>)->Result<u64,String>{state.workspace.begin()}
 #[tauri::command]
 fn workspace_end(state: State<'_,AppState>,token:u64)->Result<(),String>{state.workspace.end(token)}
@@ -370,6 +403,9 @@ pub fn run() {
             agent_files::agent_cli_uninstall,
             store_read,
             store_write,
+            store_remove,
+            read_json,
+            write_json,
             take_launch_paths,
             path_exists,
             ensure_dir,

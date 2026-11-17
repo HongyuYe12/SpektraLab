@@ -67,6 +67,17 @@ export function browserPlatform(): Platform {
     async storeWrite(area, name, value) {
       ls()?.setItem(`store:${area}/${name}`, JSON.stringify(value));
     },
+    async storeRemove(area, name) {
+      ls()?.removeItem(`store:${area}/${name}`);
+    },
+    async readJson(path) {
+      const raw = ls()?.getItem(`json:${path}`);
+      if (!raw) throw new Error(`No JSON file at ${path}`);
+      return JSON.parse(raw) as unknown;
+    },
+    async writeJson(path, value) {
+      ls()?.setItem(`json:${path}`, JSON.stringify(value));
+    },
     takeLaunchPaths: async () => {
       const q = new URLSearchParams(location.search).get('open');
       return q === null ? [] : [q || ROLL];
@@ -84,6 +95,7 @@ export function browserPlatform(): Platform {
     }),
     pickFolder: async () => ROLL,
     pickFiles: async () => entries(ROLL).slice(0, 3).map((e) => e.path),
+    pickJson: async () => '/mock/SpektraLab Settings.json',
     pickSave: async (_t, defaultPath) => defaultPath,
     reveal: async (p) => console.info('reveal', p),
     openUrl: async (u) => void window.open(u, '_blank'),

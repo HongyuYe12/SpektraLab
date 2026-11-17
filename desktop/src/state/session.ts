@@ -37,6 +37,7 @@ import { canvasGeometryFor, edgeEffective, gateFramed, geometryInNegative, resol
 import { type HalfFramePair, type PairHole, type PairLayer, type PairPlacement, type PairSide, PAIR_SIDES,
   decodePair, encodePair, isPairPath, newHole, newPair, pairFilmFormat, pairRects, pairFitRegion, pairSnapshotFor, pairWithMeterReadings, printTrim, resolvePairParams } from '@shared/pair';
 import { type DecodeSettings, type Sidecar, decodeSidecar, encodeSidecar, newSidecar } from '@shared/sidecar';
+import { decodeSettingsPreset, SETTINGS_PRESET_AREA, SETTINGS_PRESET_NAME } from '@shared/settingsPreset';
 import { decodeWire, isRawPath, modeOf } from '@shared/whiteBalance';
 import { type ClipboardGroup, type SettingsClip, CLIPBOARD_GROUPS, applyClip, clipChanges } from '@shared/clipboard';
 import { EMPTY_CATALOG, type StockCatalog, loadCatalog } from '@shared/stocks';
@@ -1742,7 +1743,16 @@ export async function select(path: string, options: { externalReload?: boolean; 
   }
   const raw = await platform().sidecarLoad(path).catch(() => null);
   if (gen !== openGen) return;
-  const loaded = raw ? decodeSidecar(raw) : newSidecar();
+  let loaded = raw ? decodeSidecar(raw) : newSidecar();
+  let loadedStartupDefault = false;
+  if (!raw) {
+    try {
+      const preset = decodeSettingsPreset(await platform().storeRead(SETTINGS_PRESET_AREA, SETTINGS_PRESET_NAME));
+      if (preset) { loaded = preset; loadedStartupDefault = true; }
+    } catch (e) {
+      platform().log('warn', `startup settings: ${String(e)}`);
+    }
+  }
   let sidecar = filmStageSidecar(loaded);
   let pair: HalfFramePair | null = null;
   const sources = new Map<string, Sidecar>();
@@ -1801,7 +1811,7 @@ export async function select(path: string, options: { externalReload?: boolean; 
     tool: 'select',
     status: tz(`Opening ${baseName(path)}…`, `正在打开 ${baseName(path)}…`),
   });
-  if (sidecar !== loaded) scheduleSave();
+  if (sidecar !== loaded || loadedStartupDefault) scheduleSave();
   await seedFilmEdge(path, gen);
   if (gen !== openGen) return;
   const warming = warmDisplayFromCache(path, gen).catch(() => {});
@@ -2044,6 +2054,25 @@ export function resetAdjustments() {
 }
 export function resetCrop() {
   setGeometry(() => GEOMETRY_DEFAULT);
+}
+
+/** Apply a portable full-editor setup to the current frame as one undo step. */
+export function applySettingsPreset(preset: Sidecar) {
+  const s = get();
+  if (s.batchExporting || !s.selection) return false;
+  lastUndoAt = 0;
+  pushUndo();
+  restore({
+    noFilm: preset.noFilm,
+    params: preset.params,
+    adjustments: preset.adjustments,
+    geometry: preset.geometry,
+    heldCrop: preset.heldCrop,
+    pair: s.pair,
+    decode: preset.decode,
+    placementNeedsFit: preset.placementNeedsFit,
+  });
+  return true;
 }
 
 // ---------------------------------------------------------------- clipboard

@@ -40,12 +40,16 @@ export interface Platform {
   pairDelete(path: string): Promise<void>;
   storeRead(area: string, name: string): Promise<unknown | null>;
   storeWrite(area: string, name: string, value: unknown): Promise<void>;
+  storeRemove(area: string, name: string): Promise<void>;
+  readJson(path: string): Promise<unknown>;
+  writeJson(path: string, value: unknown): Promise<void>;
   takeLaunchPaths(): Promise<string[]>;
   pathExists(path: string): Promise<boolean>;
   ensureDir(path: string): Promise<void>;
   appPaths(): Promise<AppPaths>;
   pickFolder(title: string): Promise<string | null>;
   pickFiles(title: string): Promise<string[]>;
+  pickJson(title: string): Promise<string | null>;
   pickSave(title: string, defaultPath: string, ext: string): Promise<string | null>;
   reveal(path: string): Promise<void>;
   openUrl(url: string): Promise<void>;

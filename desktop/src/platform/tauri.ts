@@ -26,6 +26,9 @@ export function tauriPlatform(): Platform {
     pairDelete: (path) => invoke<void>('pair_delete', { path }),
     storeRead: (area, name) => invoke<unknown | null>('store_read', { area, name }),
     storeWrite: (area, name, value) => invoke<void>('store_write', { area, name, value }),
+    storeRemove: (area, name) => invoke<void>('store_remove', { area, name }),
+    readJson: (path) => invoke<unknown>('read_json', { path }),
+    writeJson: (path, value) => invoke<void>('write_json', { path, value }),
     takeLaunchPaths: () => invoke<string[]>('take_launch_paths'),
     pathExists: (path) => invoke<boolean>('path_exists', { path }),
     ensureDir: (path) => invoke<void>('ensure_dir', { path }),
@@ -48,6 +51,10 @@ export function tauriPlatform(): Platform {
       });
       if (Array.isArray(r)) return r;
       return typeof r === 'string' ? [r] : [];
+    },
+    async pickJson(title) {
+      const r = await open({ multiple: false, title, filters: [{ name: 'JSON', extensions: ['json'] }] });
+      return typeof r === 'string' ? r : null;
     },
     async pickSave(title, defaultPath, ext) {
       const r = await save({ title, defaultPath, filters: [{ name: ext.toUpperCase(), extensions: [ext] }] });

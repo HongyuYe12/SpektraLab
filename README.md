@@ -1,6 +1,11 @@
 # SpektraLab
 
-**English** · [简体中文](README.zh-CN.md) · [spektralab.app](https://spektralab.app)
+**English** · [简体中文](README.zh-CN.md) · [Windows build notes](WINDOWS-README.md)
+
+> This repository's `main` branch is the native Windows edition maintained at
+> [HongyuYe12/SpektraStudio](https://github.com/HongyuYe12/SpektraStudio). It uses
+> the C++/Vulkan engine and the Tauri interface; the legacy Qt frontend is not
+> part of the Windows build. The application remains **SpektraLab** and GPLv3.
 
 A film and print simulator for macOS. Open a RAW, pick a film and a paper,
 and get a physically modelled print — grain, halation, couplers, the enlarger's
@@ -123,13 +128,12 @@ and the run still reports 0 failures in ~20 s — trust the duration.
 
 ## Windows development
 
-This branch also contains a C++/Vulkan backend, native LibRaw decoding,
-RGB16 TIFF export and Windows desktop viewers.
-See the [Windows build guide](engine/WINDOWS.md) and
-[feature coverage](engine/WINDOWS_FEATURE_COVERAGE.md) for the tested scope.
-The [Qt Quick frontend](windows_UI/README.md) brings the film/print editor layout
-to Windows; the [minimal Win32 viewer](engine/WINDOWS_DESKTOP.md) is also retained.
-The macOS product described above has additional interface and display features.
+The supported Windows application uses the C++/Vulkan engine, native LibRaw
+decoding and the React/Tauri desktop interface under `desktop/`. It includes
+Film Edge, Date Back, Scene Placement, half-frame pairs, bilingual UI, batch
+export and portable settings presets. The old `windows_UI/` Qt/QML experiment
+is retained only as source history and is not built. See [WINDOWS-README.md](WINDOWS-README.md)
+for the reproducible build and installer path.
 
 ## Contributing
 
